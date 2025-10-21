@@ -39,10 +39,16 @@ The program allows users to manage contacts by adding, deleting, searching, and 
 
 ---
 
-## How to Run
-1. Clone this repository:  
+## How to Contribute
+To keep our `main` branch clean and stable, please follow this workflow when contributing:
+
+1. **Fork the Repository**  
+   - Click the **Fork** button at the top-right of this repo to create your own copy under your GitHub account.
+
+2. **Clone Your Fork**  
    ```bash
-   git clone https://github.com/mrfahrenheit0528/Architecture-and-Organization-Final-Project.git
+   git clone https://github.com/<your-username>/Architecture-and-Organization-Final-Project.git
+
 
 ---
 
