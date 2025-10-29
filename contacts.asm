@@ -38,13 +38,6 @@ section .text
 	global _main
 	extern _printf, _scanf
 
-%macro GET_CONTACT_ADDR 2
-	; %1 = index (register), %2 = output register (edi/esi/etc)
-	mov eax, %1
-	mul RECORD_SIZE
-	mov %2, contacts
-	add %2, eax
-%endmacro
 
 ;--- add contact --------------
 add_contact:
