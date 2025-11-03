@@ -436,7 +436,7 @@ search_by_name:
     jmp search_menu
 
 
-; ----- search_by_number -----
+; ----- search_by_phone -----
 search_by_number:
     ; check if there are any contacts
     mov eax, [contact_count]
@@ -682,9 +682,9 @@ _main:
 		cmp eax, 0
 			je main_menu
 		 cmp eax, 1
-		 	je search_by_name
+			je search_by_name
 		 cmp eax, 2
-		 	je search_by_number
+			je search_by_number
 
         push inputChoiceInvalid
 		call _printf
