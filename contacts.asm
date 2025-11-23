@@ -1357,7 +1357,7 @@ display_all_contacts:
     ; compare with previous name
     push esi
     push edi
-    call compare_names_case_insensitive
+    call compare_str
     add esp, 8
 
     cmp eax, 0
@@ -1490,7 +1490,7 @@ display_contacts_by_letter:
 
     push eax
     push edx
-    call compare_names_case_insensitive
+    call compare_str
     add esp, 8
 
     pop ebx                 ; restore search letter
