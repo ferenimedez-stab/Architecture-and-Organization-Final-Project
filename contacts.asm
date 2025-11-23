@@ -12,6 +12,7 @@ section .data
     delete_hdr db 10, "--------------- DELETE Contact ---------------", 10, 0
     search_hdr db 10, "~~~~~~~~~~~~~~~ SEARCH Contact ~~~~~~~~~~~~~~~", 10, 0
     display_hdr db 10, "*************** Contact List ****************", 10, 0
+    letter_header db "%c ----------------------------------------------", 10, 0
 
     ; PROMPTS
     prompt_choice db 10, "Enter your choice: ", 0
@@ -1331,14 +1332,15 @@ display_all_contacts:
     add esp, 4
 
     mov eax, [contact_count]
-    cmp eax, 0              ; check if there are contacts in record
-    je .no_dp_contacts      ; if not, display no contacts msg
+    cmp eax, 0
+    je .no_dp_contacts
 
     ; sort contacts
     call bubble_sort_contacts
 
-    mov ebx, 0      ; index_counter
-    mov edi, 0      ; previous name ptr (0 = no previous)
+    mov ebx, 0          ; index counter
+    mov edi, 0          ; previous name ptr (0 = no previous)
+    mov byte [temp_name], 0   ; previous letter (0 = none)
 
 .display_loop:
     cmp ebx, [contact_count]
@@ -1350,15 +1352,57 @@ display_all_contacts:
     mov esi, contacts
     add esi, ecx
 
+    ; get first letter of current name
+    mov al, byte [esi]
+
+    ; convert to uppercase for display
+    cmp al, 'a'
+    jl .already_upper
+    cmp al, 'z'
+    jg .already_upper
+    sub al, 32          ; convert to uppercase
+
+.already_upper:
+    ; check if different from previous letter
+    cmp al, byte [temp_name]
+    je .same_letter_section
+
+    ; new letter section - display header
+    mov byte [temp_name], al    ; save current letter
+
+    push eax                    ; save registers
+    push ebx
+    push esi
+    push edi
+
+    ; print newline
+    push newline
+    call _printf
+    add esp, 4
+
+    ; print letter
+    movzx eax, byte [temp_name]
+    push eax
+    push letter_header          ; "%c ---------------------------------------------------------\n"
+    call _printf
+    add esp, 8
+
+    pop edi                     ; restore registers
+    pop esi
+    pop ebx
+    pop eax
+
+.same_letter_section:
     ; check if same name as previous
     cmp edi, 0
-    je .display_full    ; first contact
+    je .display_full
 
-    ; compare with previous name
+    ; compare with previous name (case-sensitive)
+    push NAME_SIZE
     push esi
     push edi
     call compare_str
-    add esp, 8
+    add esp, 12
 
     cmp eax, 0
     je .display_number_only
@@ -1370,6 +1414,7 @@ display_all_contacts:
     mov esi, contacts
     add esi, ecx
     mov edi, esi        ; save current name ptr
+
     push esi
     add esi, NAME_SIZE
     push esi
@@ -1395,12 +1440,11 @@ display_all_contacts:
     add esi, ecx
     add esi, NAME_SIZE
 
-    ; set up empty string for name field
-    mov byte [temp_name], ' '
-    mov byte [temp_name+1], 0
+    mov byte [temp_name + 1], ' '
+    mov byte [temp_name + 2], 0
 
-    push esi            ; number
-    push temp_name      ; empty string
+    push esi
+    push temp_name + 1
     push fmt_display_add
     call _printf
     add esp, 12
@@ -1414,7 +1458,6 @@ display_all_contacts:
     add esp, 4
     jmp main_menu
 
-; ----- display_contacts_by_letter -----
 ; ----- display_contacts_by_letter -----
 display_contacts_by_letter:
     push display_hdr
